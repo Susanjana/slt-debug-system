@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create result.csv
-echo "Freq,Voltage,PD,CG,GHSmm,Temp,TMax,WU,GHSav,DH,Cout,Vo,Power,Power/GHSav" > miner-result.csv
+echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav" > miner-result.csv
 
 # Get raspberry IP address
 IP=`cat ip-cgminer-option.conf | sed -n '2p' | awk '{ print $1 }'`

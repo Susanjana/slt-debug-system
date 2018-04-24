@@ -14,8 +14,6 @@ cd ./$dirname
 
 echo "$2" > freq.log
 echo "$4" > voltage.log
-echo "$6" > pd.log
-echo "$8" > cg.log
 
 for i in CGMiner_Debug.log
 do
@@ -24,13 +22,13 @@ do
     cat $i | sed 's/] /\]\n/g' | grep TMax  | sed 's/TMax\[//g'  | sed 's/\]//g' > $i.TMax
     cat $i | sed 's/] /\]\n/g' | grep WU    | sed 's/WU\[//g'    | sed 's/\]//g' > $i.WU
     cat $i | sed 's/] /\]\n/g' | grep DH    | sed 's/DH\[//g'    | sed 's/\]//g' > $i.DH
-    cat $i | sed 's/] /\]\n/g' | grep "Cout\["    | sed 's/Cout\[//g'    | sed 's/\]//g' > $i.Cout
+    cat $i | sed 's/] /\]\n/g' | grep "Iout\["    | sed 's/Iout\[//g'    | sed 's/\]//g' > $i.Iout
     cat $i | sed 's/] /\]\n/g' | grep V0 | awk '{ print $3}' > $i.V0
 
     # Power
-    cout=`cat $i.Cout`
+    iout=`cat $i.Iout`
     vo=`cat $i.V0`
-    power=$(echo "scale=1;$vo * $cout / 1000 / 100" | bc)
+    power=$(echo "scale=2;$vo * $iout / 1000" | bc)
     echo $power > $i.Power
 
     # According to WU value, calculate GHSav.
@@ -44,10 +42,10 @@ do
 
     Result=Results_$dirname
 
-    paste -d, freq.log voltage.log pd.log cg.log $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH $i.Cout $i.V0 $i.Power ph.log > ${Result#.log}.csv
+    paste -d, freq.log voltage.log $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH $i.Iout $i.V0 $i.Power ph.log > ${Result#.log}.csv
     cat *.csv >> ../miner-result.csv
 
-    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH freq.log voltage.log pd.log cg.log $i.Cout $i.V0 ph.log
+    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH freq.log voltage.log $i.Iout $i.V0 ph.log
 
     cd ..
     mv ./$dirname ./result*
