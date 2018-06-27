@@ -1,10 +1,13 @@
 #!/bin/bash
+#
+# Author Feb 2018 Zhenxing Xu <xzxlnmail@163.com>
+#
 
 # Create result.csv
 echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav" > miner-result.csv
 
 # Get raspberry IP address
-IP=`cat ip-cgminer-option.conf | sed -n '2p' | awk '{ print $1 }'`
+IP=`cat slt-options.conf | sed -n '2p' | awk '{ print $1 }'`
 tmp=`who | cut -f 1 -d: | awk '{ print $1 }'`
 name=`echo $tmp | awk '{ print $1 }'`
 echo $name
@@ -17,7 +20,7 @@ dirip="result-"$IP
 mkdir $dirip
 
 # Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
-cat ip-cgminer-option.conf | grep avalon |  while read tmp
+cat slt-options.conf | grep avalon |  while read tmp
 do
     more_options=`cat cgminer | grep more_options`
     if [ "$more_options" == "" ]; then
@@ -43,7 +46,7 @@ do
     ./ssh-login.exp $IP cgminer-api summary summary.log > /dev/null
 
     # Read CGMiner Log
-    ./read-debuglog.sh $tmp
+    ./debuglog.sh $tmp
 done
 
 # Remove cgminer file

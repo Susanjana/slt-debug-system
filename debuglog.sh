@@ -1,6 +1,9 @@
 #!/bin/bash
+#
+# Author Feb 2018 Zhenxing Xu <xzxlnmail@163.com>
+#
 
-IP=`cat ip-cgminer-option.conf | sed -n '2p' | awk '{ print $1 }'`
+IP=`cat slt-options.conf | sed -n '2p' | awk '{ print $1 }'`
 DATE=`date +%Y%m%d%H%M`
 dirname=$IP"-"$DATE"-"$2"-"$4"-"$6"-"$8
 mkdir $dirname
