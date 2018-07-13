@@ -10,7 +10,6 @@ echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav" > mine
 IP=`cat slt-options.conf | sed -n '2p' | awk '{ print $1 }'`
 tmp=`who | cut -f 1 -d: | awk '{ print $1 }'`
 name=`echo $tmp | awk '{ print $1 }'`
-echo $name
 ssh-keygen -f "/home/$name/.ssh/known_hosts" -R $IP
 ./scp-login.exp $IP 0
 sleep 3
@@ -36,7 +35,7 @@ do
 
     # CGMiner restart
     ./ssh-login.exp $IP /etc/init.d/cgminer restart
-    sleep 900
+    sleep 30
 
     # SSH no password
     ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
