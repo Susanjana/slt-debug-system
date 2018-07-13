@@ -10,8 +10,8 @@ echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav" > mine
 IP=`cat slt-options.conf | sed -n '2p' | awk '{ print $1 }'`
 tmp=`who | cut -f 1 -d: | awk '{ print $1 }'`
 name=`echo $tmp | awk '{ print $1 }'`
-ssh-keygen -f "/home/$name/.ssh/known_hosts" -R $IP
-./scp-login.exp $IP 0
+ssh-keygen -f "/home/$name/.ssh/known_hosts" -R $IP > /dev/null
+./scp-login.exp $IP 0 > /dev/null
 sleep 3
 
 # Create result directory
@@ -34,7 +34,7 @@ do
     sleep 3
 
     # CGMiner restart
-    ./ssh-login.exp $IP /etc/init.d/cgminer restart
+    ./ssh-login.exp $IP /etc/init.d/cgminer restart > /dev/null
     sleep 30
 
     # SSH no password
@@ -50,3 +50,7 @@ done
 
 # Remove cgminer file
 rm cgminer
+
+echo -e "\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m"
+echo -e "\033[1;32m++++++++++++++++++++++++++++++  Done   ++++++++++++++++++++++++++++++\033[0m"
+echo -e "\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m"
