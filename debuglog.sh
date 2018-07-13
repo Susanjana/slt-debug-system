@@ -4,8 +4,8 @@
 #
 
 IP=`cat slt-options.conf | sed -n '2p' | awk '{ print $1 }'`
-DATE=`date +%Y%m%d%H%M`
-dirname=$IP"-"$DATE"-"$2"-"$4"-"$6"-"$8
+DATE=`date +%Y-%m-%d-%H-%M-%S`
+dirname=$IP"-"$DATE"-"$2"-"$4
 mkdir $dirname
 
 cat estats.log  | grep "\[MM ID" > ./$dirname/CGMiner_Debug.log
@@ -46,6 +46,7 @@ do
     Result=Results_$dirname
 
     paste -d, freq.log voltage.log $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH $i.Iout $i.V0 $i.Power ph.log > ${Result#.log}.csv
+    echo $@ >> ../miner-result.csv
     cat *.csv >> ../miner-result.csv
 
     rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH freq.log voltage.log $i.Iout $i.V0 ph.log
