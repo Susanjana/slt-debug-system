@@ -4,7 +4,7 @@
 #
 
 # Create result.csv
-echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav" > miner-result.csv
+echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav,Options" > miner-result.csv
 
 # Get raspberry IP address
 IP=`cat slt-options.conf | sed -n '2p' | awk '{ print $1 }'`
