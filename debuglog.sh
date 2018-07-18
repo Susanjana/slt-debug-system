@@ -3,7 +3,7 @@
 # Author Feb 2018 Zhenxing Xu <xzxlnmail@163.com>
 #
 
-IP=`cat slt-options.conf | sed -n '2p' | awk '{ print $1 }'`
+IP=`cat slt-options.conf | grep "IP" | awk '{ print $2 }'`
 DATE=`date +%Y-%m-%d-%H-%M-%S`
 dirname=$IP"-"$DATE"-"$2"-"$4
 mkdir $dirname
@@ -26,23 +26,16 @@ do
     cat $i | sed 's/] /\]\n/g' | grep TMax  | sed 's/TMax\[//g'  | sed 's/\]//g' > $i.TMax
     cat $i | sed 's/] /\]\n/g' | grep WU    | sed 's/WU\[//g'    | sed 's/\]//g' > $i.WU
     cat $i | sed 's/] /\]\n/g' | grep DH    | sed 's/DH\[//g'    | sed 's/\]//g' > $i.DH
+    cat $i | sed 's/] /\]\n/g' | grep Power | sed 's/Power\[//g' | sed 's/\]//g' > $i.Power
     cat $i | sed 's/] /\]\n/g' | grep "Iout\["    | sed 's/Iout\[//g'    | sed 's/\]//g' > $i.Iout
-    cat $i | sed 's/] /\]\n/g' | grep V0 | awk '{ print $3}' > $i.V0
-
-    # Power
-    iout=`cat $i.Iout`
-    vo=`cat $i.V0`
-    power=$(echo "scale=2;$vo * $iout / 1000" | bc)
-    echo $power > $i.Power
+    cat $i | sed 's/] /\]\n/g' | grep V0 | awk '{ print $3 }' > $i.V0
 
     # According to WU value, calculate GHSav.
-    # Formula: ghsav = WU / 60 * 2^32 /10^9
+    # Formula: ghsav = WU / 60 * 2^32 / 10^9
     cat $i.WU | awk '{printf ("%.2f\n", ($1/60*2^32/10^9))}' > $i.GHSav
 
-    # Power ratio
-    ghsav=`cat $i.GHSav`
-    ph=$(echo "scale=3;$power / $ghsav" | bc)
-    echo $ph > ph.log
+    # Power / GHSav
+    paste $i.GHSav $i.Power | awk '{printf ("%.3f\n", ($2/$1))}' > ph.log
 
     Result=Results_$dirname
 
@@ -50,7 +43,7 @@ do
     cat *.csv >> ../miner-result.csv
     echo "" >> ../miner-result.csv
 
-    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH freq.log voltage.log $i.Iout $i.V0 ph.log options.log
+    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH freq.log voltage.log $i.Iout $i.V0 $i.Power ph.log options.log
 
     cd ..
     mv ./$dirname ./result*

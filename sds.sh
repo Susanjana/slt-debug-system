@@ -7,12 +7,14 @@
 echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav,Options" > miner-result.csv
 
 # Get raspberry IP address
-IP=`cat slt-options.conf | sed -n '2p' | awk '{ print $1 }'`
+IP=`cat slt-options.conf | grep "IP" | awk '{ print $2 }'`
 tmp=`who | cut -f 1 -d: | awk '{ print $1 }'`
 name=`echo $tmp | awk '{ print $1 }'`
 ssh-keygen -f "/home/$name/.ssh/known_hosts" -R $IP > /dev/null
 ./scp-login.exp $IP 0 > /dev/null
 sleep 3
+
+TIME=`cat slt-options.conf | grep "TIME" | awk '{ print $2 }'`
 
 # Create result directory
 dirip="result-"$IP
@@ -35,7 +37,7 @@ do
 
     # CGMiner restart
     ./ssh-login.exp $IP /etc/init.d/cgminer restart > /dev/null
-    sleep 30
+    sleep $TIME
 
     ./ssh-login.exp $IP cgminer-api debug debug.log > /dev/null
     debug=`cat debug.log | grep '\[Debug\] => true' | wc -l`
@@ -55,6 +57,7 @@ done
 
 # Remove cgminer file
 rm cgminer
+rm debug.log
 
 echo -e "\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m"
 echo -e "\033[1;32m++++++++++++++++++++++++++++++  Done   ++++++++++++++++++++++++++++++\033[0m"
