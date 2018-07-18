@@ -37,8 +37,13 @@ do
     ./ssh-login.exp $IP /etc/init.d/cgminer restart > /dev/null
     sleep 30
 
-    # SSH no password
-    ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
+    ./ssh-login.exp $IP cgminer-api debug debug.log > /dev/null
+    debug=`cat debug.log | grep '\[Debug\] => true' | wc -l`
+    if [ $debug -eq 0 ]; then
+        # SSH no password
+        ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
+    fi
+
     sleep 1
     ./ssh-login.exp $IP cgminer-api estats estats.log > /dev/null
     ./ssh-login.exp $IP cgminer-api edevs edevs.log > /dev/null
