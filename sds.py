@@ -1,25 +1,42 @@
-#!/bin/bash
-#
-# Author Feb 2018 Zhenxing Xu <xzxlnmail@163.com>
-#
+#!/usr/bin/env python
+
+import subprocess
+import logging
+import time
+import os
+
+logging.basicConfig(level=logging.DEBUG)
 
 # Create result.csv
-echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav,Options" > miner-result.csv
+#subprocess.call("echo 'Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav,Options' > miner-result.csv", shell=True)
 
-# Get raspberry IP address
-IP=`cat slt-options.conf | grep "IP" | awk '{ print $2 }'`
-tmp=`who | cut -f 1 -d: | awk '{ print $1 }'`
-name=`echo $tmp | awk '{ print $1 }'`
-ssh-keygen -f "/home/$name/.ssh/known_hosts" -R $IP > /dev/null
+# Get ip
+path = 'slt-options.conf'
+with open(path, 'r') as f:
+    tmp = list(f.readlines())
+    tmp = tmp[2].split()
+    ip = tmp[1]
+logging.debug('ip = %s', ip)
+
+# Get time
+with open(path, 'r') as f:
+    tmp = list(f.readlines())
+    tmp = tmp[0].split()
+    time = tmp[1]
+logging.debug('time = %s', time)
+
+# Remote getting cgminer file
+'''
 ./scp-login.exp $IP 0 > /dev/null
-sleep 3
+time.sleep(3)
+'''
 
-TIME=`cat slt-options.conf | grep "TIME" | awk '{ print $2 }'`
+# Create directory
+dirip = "result" + "-" + ip
+logging.debug('dir = %s', dirip)
+os.makedirs(dirip)
 
-# Create result directory
-dirip="result-"$IP
-mkdir $dirip
-
+'''
 # Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
 cat slt-options.conf | grep avalon |  while read tmp
 do
@@ -62,3 +79,4 @@ rm debug.log
 echo -e "\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m"
 echo -e "\033[1;32m++++++++++++++++++++++++++++++  Done   ++++++++++++++++++++++++++++++\033[0m"
 echo -e "\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m"
+'''
