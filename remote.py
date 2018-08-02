@@ -6,7 +6,10 @@ import sys
 import time
 import paramiko
 
-def ssh_read_power(ip):
+global ip
+global flag
+
+def remote_cmd():
     v = None
     retry = 3
     for i in range(0, retry):
@@ -21,8 +24,17 @@ def ssh_read_power(ip):
                 if k == retry - 1:
                     return None
         try:
-            stdin, stdout, stderr = ssh.exec_command(
-                'python /usr/bin/readpower')
+            if (flag == 0):
+                stdin, stdout, stderr = ssh.exec_command(
+                    'cgminer-api estats')
+            elif (flag == 1):
+                stdin, stdout, stderr = ssh.exec_command(
+                    'cgminer-api edevs')
+            elif (flag == 2):
+                stdin, stdout, stderr = ssh.exec_command(
+                    'cgminer-api summary')
+            else:
+                return None
             time.sleep(2)
             v = stdout.read()
         except:
@@ -33,27 +45,27 @@ def ssh_read_power(ip):
         break
     return v
 
-
-def remote_scp(flag, ip):
-    ssh_port = 22
-    try:
-        conn = paramiko.Transport((ip, ssh_port))
-        conn.connect(username="root", password=1)
-        sftp = paramiko.SFTPClient.from_transport(conn)
-        print("2")
-        if (flag == 0):
-            if not local_path:
-                conn.close()
-                return False
-            sftp.get("/root/test", "./")
-    except Exception:
-        print("except")
-        return False
-
-    conn.close()
-    return True
-
 if __name__ == '__main__':
     ip = sys.argv[1]
+    flag = int(sys.argv[2])
 
-    remote_scp(0, ip)
+    datas = remote_cmd()
+    if datas is None:
+        print("Get datas failed.")
+        sys.exit(1)
+
+    if (flag == 0):
+        estats = open('estats.log', 'w+')
+        estats.write(str(datas))
+        estats.close()
+    elif (flag == 1):
+        estats = open('edevs.log', 'w+')
+        estats.write(str(datas))
+        estats.close()
+    elif (flag == 2):
+        estats = open('summary.log', 'w+')
+        estats.write(str(datas))
+        estats.close()
+    else:
+        print("Flag value error.")
+        sys.exit(1)
