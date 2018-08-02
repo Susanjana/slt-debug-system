@@ -5,6 +5,7 @@ import telnetlib
 import sys
 import time
 import paramiko
+import os
 
 global ip
 global flag
@@ -45,10 +46,24 @@ def remote_cmd():
         break
     return v
 
+def remote_scp():
+    if (flag == 0):
+        os.system("scp root@%s:/etc/config/cgminer ./" % ip)
+    elif (flag == 1):
+        os.system("scp ./hash-wu.md root@%s:/etc/config/" % ip)
+    else:
+        return False
+
+    return True
+
 if __name__ == '__main__':
     ip = sys.argv[1]
     flag = int(sys.argv[2])
 
+    if (remote_scp() == True):
+        sys.exit(1)
+
+    sys.exit(1)
     datas = remote_cmd()
     if datas is None:
         print("Get datas failed.")
