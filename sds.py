@@ -4,37 +4,35 @@ import subprocess
 import logging
 import time
 import os
+import config
 
 logging.basicConfig(level=logging.DEBUG)
 
 # Create result.csv
 #subprocess.call("echo 'Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav,Options' > miner-result.csv", shell=True)
 
+# Get time
+time = config.config['time']
+logging.debug('time = %s', time)
+
 # Get ip
-path = 'slt-options.conf'
-with open(path, 'r') as f:
-    tmp = list(f.readlines())
-    tmp = tmp[2].split()
-    ip = tmp[1]
+ip = config.config['ip']
 logging.debug('ip = %s', ip)
 
-# Get time
-with open(path, 'r') as f:
-    tmp = list(f.readlines())
-    tmp = tmp[0].split()
-    time = tmp[1]
-logging.debug('time = %s', time)
+# Get options
+options = config.config['options']
+logging.debug(options)
+
+# Create directory
+dirip = "result" + "-" + ip
+logging.debug('dir = %s', dirip)
+os.makedirs(dirip)
 
 # Remote getting cgminer file
 '''
 ./scp-login.exp $IP 0 > /dev/null
 time.sleep(3)
 '''
-
-# Create directory
-dirip = "result" + "-" + ip
-logging.debug('dir = %s', dirip)
-os.makedirs(dirip)
 
 '''
 # Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
