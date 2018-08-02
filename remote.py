@@ -48,7 +48,7 @@ def remote_scp(ip, flag):
     if (int(flag) == 0):
         os.system("scp root@%s:/etc/config/cgminer ./" % ip)
     elif (int(flag) == 1):
-        os.system("scp ./hash-wu.md root@%s:/etc/config/" % ip)
+        os.system("scp ./cgminer root@%s:/etc/config/" % ip)
     else:
         print("ip = %s, flag = %s" % (ip, flag))
         return False
