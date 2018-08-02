@@ -5,6 +5,7 @@ import logging
 import time
 import os
 import config
+import remote
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -12,8 +13,8 @@ logging.basicConfig(level=logging.DEBUG)
 #subprocess.call("echo 'Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav,Options' > miner-result.csv", shell=True)
 
 # Get time
-time = config.config['time']
-logging.debug('time = %s', time)
+times = config.config['time']
+logging.debug('times = %s', times)
 
 # Get ip
 ip = config.config['ip']
@@ -26,16 +27,17 @@ logging.debug(options)
 # Create directory
 dirip = "result" + "-" + ip
 logging.debug('dir = %s', dirip)
-os.makedirs(dirip)
+#os.makedirs(dirip)
 
 # Remote getting cgminer file
-'''
-./scp-login.exp $IP 0 > /dev/null
+remote.remote_scp(ip, 0)
 time.sleep(3)
-'''
+
+# Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
+for i in options:
+    print(i)
 
 '''
-# Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
 cat slt-options.conf | grep avalon |  while read tmp
 do
     more_options=`cat cgminer | grep more_options`
@@ -60,6 +62,7 @@ do
         # SSH no password
         ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
     fi
+    rm debug.log
 
     sleep 1
     ./ssh-login.exp $IP cgminer-api estats estats.log > /dev/null
@@ -69,12 +72,11 @@ do
     # Read CGMiner Log
     ./debuglog.sh $tmp
 done
+'''
 
 # Remove cgminer file
-rm cgminer
-rm debug.log
+os.system("rm ./cgminer")
 
-echo -e "\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m"
-echo -e "\033[1;32m++++++++++++++++++++++++++++++  Done   ++++++++++++++++++++++++++++++\033[0m"
-echo -e "\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m"
-'''
+print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
+print("\033[1;32m++++++++++++++++++++++++++++++  Done   ++++++++++++++++++++++++++++++\033[0m")
+print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
