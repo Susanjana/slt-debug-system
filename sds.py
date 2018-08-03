@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 import subprocess
 import logging
 import time
@@ -12,46 +13,46 @@ logging.basicConfig(level=logging.DEBUG)
 # Create result.csv
 #subprocess.call("echo 'Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav,Options' > miner-result.csv", shell=True)
 
-# Get time
-times = config.config['time']
-logging.debug('times = %s', times)
-
-# Get ip
-ip = config.config['ip']
-logging.debug('ip = %s', ip)
-
-# Get options
-options = config.config['options']
-logging.debug(options)
-
 # Create directory
-dirip = "result" + "-" + ip
-logging.debug('dir = %s', dirip)
+#dirip = "result" + "-" + ip
+#logging.debug('dir = %s', dirip)
 #os.makedirs(dirip)
 
-# Remote getting cgminer file
-remote.remote_scp(ip, 0)
-time.sleep(3)
+def get_time():
+    return config.config['time']
 
-# Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
-for i in options:
-    print(i)
+def get_ip():
+    return config.config['ip']
+
+def get_options():
+    return config.config['options']
+
+if __name__ == '__main__':
+    times = get_time()
+    logging.debug('times = %s', times)
+
+    ip = get_ip()
+    logging.debug('ip = %s', ip)
+
+    options = get_options()
+    logging.debug(options)
+
+    # Remote getting cgminer file
+    remote.remote_scp(ip, 0)
+    time.sleep(3)
+
+    for tmp in options:
+        if (not os.system('cat cgminer | grep more_option')):
+            os.system('more_options=`cat cgminer | grep more_options`; sed -i "s/$more_options/        option more_options     %s/g" cgminer' % tmp)
+        else:
+            os.system("echo '       option more_options %s' >> cgminer" % tmp)
+        time.sleep(5)
+
+        # Send cgminer file to remote
+        remote.remote_scp(ip, 1)
+        time.sleep(3)
 
 '''
-cat slt-options.conf | grep avalon |  while read tmp
-do
-    more_options=`cat cgminer | grep more_options`
-    if [ "$more_options" == "" ]; then
-        echo "option more_options" >> cgminer
-    fi
-
-    more_options=`cat cgminer | grep more_options`
-    sed -i "s/$more_options/	option more_options '$tmp'/g" cgminer
-
-    # Cp cgminer to /etc/config
-    ./scp-login.exp $IP 1
-    sleep 3
-
     # CGMiner restart
     ./ssh-login.exp $IP /etc/init.d/cgminer restart > /dev/null
     sleep $TIME
@@ -75,7 +76,7 @@ done
 '''
 
 # Remove cgminer file
-os.system("rm ./cgminer")
+#os.system("rm ./cgminer")
 
 print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
 print("\033[1;32m++++++++++++++++++++++++++++++  Done   ++++++++++++++++++++++++++++++\033[0m")
