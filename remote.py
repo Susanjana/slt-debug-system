@@ -32,6 +32,12 @@ def remote_cmd(ip, flag):
             elif (int(flag) == 2):
                 stdin, stdout, stderr = ssh.exec_command(
                     'cgminer-api summary')
+            elif (int(flag) == 3):
+                stdin, stdout, stderr = ssh.exec_command(
+                    'cgminer-api debug\|D')
+            elif (int(flag) == 4):
+                stdin, stdout, stderr = ssh.exec_command(
+                    '/etc/init.d/cgminer restart')
             else:
                 return None
             time.sleep(2)
@@ -81,5 +87,7 @@ if __name__ == '__main__':
             estats = open('summary.log', 'w+')
             estats.write(str(datas))
             estats.close()
+        # Open debuglog do not have datas
+        # Reboot do not have datas
     else:
         print("mode error.")

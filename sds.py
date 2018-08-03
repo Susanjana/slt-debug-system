@@ -10,13 +10,12 @@ import remote
 
 logging.basicConfig(level=logging.DEBUG)
 
-# Create result.csv
-#subprocess.call("echo 'Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,DH,Iout,Vo,Power,Power/GHSav,Options' > miner-result.csv", shell=True)
+def make_ip_dirs():
+    global ip_dirs
 
-# Create directory
-#dirip = "result" + "-" + ip
-#logging.debug('dir = %s', dirip)
-#os.makedirs(dirip)
+    ip_dirs = "result" + "-" + config.config['ip']
+    logging.debug('ip dir = %s', ip_dirs)
+    os.makedirs(ip_dirs)
 
 def get_time():
     return config.config['time']
@@ -27,7 +26,29 @@ def get_ip():
 def get_options():
     return config.config['options']
 
+def get_debuglog():
+    datas = remote.remote_cmd(ip, 0)
+    path = '%s/estats.log' % ip_dirs
+    estats = open(path, 'w+')
+    estats.write(str(datas))
+    estats.close()
+    time.sleep(1)
+
+    datas = remote.remote_cmd(ip, 1)
+    path = '%s/edevs.log' % ip_dirs
+    edevs = open(path, 'w+')
+    edevs.write(str(datas))
+    edevs.close()
+
+    datas = remote.remote_cmd(ip, 2)
+    path = '%s/summary.log' % ip_dirs
+    summary = open(path, 'w+')
+    summary.write(str(datas))
+    summary.close()
+
 if __name__ == '__main__':
+    make_ip_dirs()
+
     times = get_time()
     logging.debug('times = %s', times)
 
@@ -52,32 +73,16 @@ if __name__ == '__main__':
         remote.remote_scp(ip, 1)
         time.sleep(3)
 
-'''
-    # CGMiner restart
-    ./ssh-login.exp $IP /etc/init.d/cgminer restart > /dev/null
-    sleep $TIME
+        # Restart cgminer
+        remote.remote_cmd(ip, 4)
+        time.sleep(times)
 
-    ./ssh-login.exp $IP cgminer-api debug debug.log > /dev/null
-    debug=`cat debug.log | grep '\[Debug\] => true' | wc -l`
-    if [ $debug -eq 0 ]; then
-        # SSH no password
-        ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
-    fi
-    rm debug.log
+        # Get debuglog messages
+        get_debuglog()
 
-    sleep 1
-    ./ssh-login.exp $IP cgminer-api estats estats.log > /dev/null
-    ./ssh-login.exp $IP cgminer-api edevs edevs.log > /dev/null
-    ./ssh-login.exp $IP cgminer-api summary summary.log > /dev/null
+    # Remove cgminer file
+    os.system("rm ./cgminer")
 
-    # Read CGMiner Log
-    ./debuglog.sh $tmp
-done
-'''
-
-# Remove cgminer file
-#os.system("rm ./cgminer")
-
-print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
-print("\033[1;32m++++++++++++++++++++++++++++++  Done   ++++++++++++++++++++++++++++++\033[0m")
-print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
+    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
+    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++  Done  ++++++++++++++++++++++++++++++++++++++++++++\033[0m")
+    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
