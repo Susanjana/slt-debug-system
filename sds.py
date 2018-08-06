@@ -12,11 +12,9 @@ import debuglog
 logging.basicConfig(level=logging.DEBUG)
 
 def make_ip_dirs():
-    global ip_dirs
-
     ip_dirs = "result" + "-" + config.config['ip']
     logging.debug('ip dir = %s', ip_dirs)
-    #os.makedirs(ip_dirs)
+    os.mkdirs(ip_dirs)
 
 if __name__ == '__main__':
     make_ip_dirs()

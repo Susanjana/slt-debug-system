@@ -85,14 +85,12 @@ if __name__ == '__main__':
     freq = sys.argv[2]
     volt_level = sys.argv[3]
 
-    '''
     ip_dirs = "result" + "-" + ip
     logging.debug("debuglog create dirs: %s", ip_dirs)
     os.makedirs(ip_dirs)
 
     debuglog_files(ip_dirs)
     handle_debuglog(ip_dirs, ip, freq, volt_level)
-    '''
 
     read_debuglog('ghsmm')
     read_debuglog('temp')
@@ -104,5 +102,5 @@ if __name__ == '__main__':
     gen_ghsav()
     power_rate()
 
-    os.system("paste -d, ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log >> result.csv")
+    os.system("paste -d, ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log >> result-miner.csv")
     os.system("rm ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log")
