@@ -1,8 +1,8 @@
 # SLT Debug System
 
-## Install expect packages
-- sudo apt-get install expect
+## Install python paramiko
+	pip install paramiko
 
 ## Running step:
-- cd slt-debug-system
-- ./sds.sh
+	cd slt-debug-system
+	./sds.py
