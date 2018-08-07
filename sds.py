@@ -12,6 +12,8 @@ import debuglog
 logging.basicConfig(level=logging.DEBUG)
 
 def make_ip_dirs():
+    global ip_dirs
+
     ip_dirs = "result" + "-" + config.config['ip']
     logging.debug('ip dir = %s', ip_dirs)
     os.mkdirs(ip_dirs)
@@ -28,13 +30,13 @@ if __name__ == '__main__':
     options = config.config['options']
     logging.debug('options = %s', options)
 
-    # Remote getting cgminer file
+    # Remote get cgminer file
     remote.remote_scp(ip, 0)
     time.sleep(3)
 
     for tmp in options:
         tmp = "'%s'" % tmp
-        if (not os.system('cat cgminer | grep more_options')):
+        if not os.system('cat cgminer | grep more_options'):
             os.system('more_options=`cat cgminer | grep more_options`; sed -i "s/$more_options/        option more_options     %s/g" cgminer' % tmp)
         else:
             os.system("echo '       option more_options %s' >> cgminer" % tmp)
@@ -49,7 +51,23 @@ if __name__ == '__main__':
         time.sleep(times)
 
         # Debuglog messages
-        debuglog.debuglog_files()
+        index = 0
+        debuglog.debuglog_files(ip_dirs)
+        freq = list(config.config['options'])[index].split()[1]
+        volt = list(config.config['options'])[index].split()[3]
+        debuglog.handle_debuglog(ip_dirs, ip, freq, volt)
+        index += 1
+
+        debuglog.read_debuglog('ghsmm')
+        debuglog.read_debuglog('temp')
+        debuglog.read_debuglog('tmax')
+        debuglog.read_debuglog('wu')
+        debuglog.read_debuglog('dh')
+        debuglog.read_debuglog('power')
+        debuglog.read_debuglog('iout')
+        debuglog.gen_ghsav()
+        debuglog.power_rate()
+        debuglog.result_files()
 
     # Remove cgminer file
     os.system("rm ./cgminer")

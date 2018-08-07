@@ -33,22 +33,28 @@ _patternd = {
     'iout': "[0-9]{1,3}\.[0-9]{1,3}",
 }
 
+global path
+
 def read_debuglog(opt):
-    with open('debug.log', 'r') as f:
+    with open(path + '/' + 'debug.log', 'r') as f:
         for lines in f:
             tmp = str(re.findall(_patternd[opt], str(re.findall(_patterns[opt], lines)))).strip("[']")
             with open(opt + '.log', 'a') as f:
                 f.write(tmp + '\n')
 
 def gen_ghsav():
-    with open('wu.log', 'r') as f:
+    with open(path + '/' + 'wu.log', 'r') as f:
         for line in f:
             tmp = round(float(line.strip()) / 60 * 2**32 / 10**9, 3)
             with open('ghsav.log', 'a') as f:
                 f.write(str(tmp) + '\n')
 
 def power_rate():
-    os.system("paste $i.GHSav $i.Power | awk '{printf ('%.3f\n', ($2 / $1))}' > ph.log")
+    os.system("paste ghsav.log power.log | awk '{printf ('%.3f\n', ($2 / $1))}' > ph.log")
+
+def result_files():
+    os.system("paste -d, ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log >> result-miner.csv")
+    os.system("rm ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log")
 
 def debuglog_files(ip_dirs):
     datas = remote.remote_cmd(ip, 0)
@@ -72,13 +78,13 @@ def debuglog_files(ip_dirs):
 def handle_debuglog(ip_dirs, ip, freq, volt_level):
     date = datetime.datetime.now().strftime('%Y.%m%d.%H%M%S')
     subdirs = ip + '-' + date + '-' + freq + '-' + volt_level
-    logging.debug("Create sub dirs name: %s", subdirs)
-    os.makedirs('%s/%s' % (ip_dirs, subdirs))
+    path = ip_dirs + '/' + subdirs
+    os.mkdirs('%s' % path)
 
     # Grep debuglog datas
-    os.system('cat %s/estats.log | grep "\[MM ID" > ./%s/%s/CGMiner_Debug.log' % (ip_dirs, ip_dirs, subdirs))
-    os.system('cat %s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log' % (ip_dirs, ip_dirs, subdirs))
-    os.system('cat %s/summary.log | grep -v Reply  > ./%s/%s/CGMiner_Summary.log' % (ip_dirs, ip_dirs, subdirs))
+    os.system('cat %s/estats.log | grep "\[MM ID" > ./%s/%s/CGMiner_Debug.log' % (dirs, dirs, subdirs))
+    os.system('cat %s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log' % (dirs, dirs, subdirs))
+    os.system('cat %s/summary.log | grep -v Reply  > ./%s/%s/CGMiner_Summary.log' % (dirs, dirs, subdirs))
 
 if __name__ == '__main__':
     ip = sys.argv[1]
@@ -101,6 +107,4 @@ if __name__ == '__main__':
     read_debuglog('iout')
     gen_ghsav()
     power_rate()
-
-    os.system("paste -d, ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log >> result-miner.csv")
-    os.system("rm ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log")
+    result_files()

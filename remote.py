@@ -40,6 +40,7 @@ def remote_cmd(ip, flag):
                     '/etc/init.d/cgminer restart')
             else:
                 return None
+
             time.sleep(2)
             v = stdout.read()
         except:
