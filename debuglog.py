@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8; -*-
 
 
 import datetime
@@ -33,30 +34,7 @@ _patternd = {
     'iout': "[0-9]{1,3}\.[0-9]{1,3}",
 }
 
-global path
-
-def read_debuglog(opt):
-    with open(path + '/' + 'debug.log', 'r') as f:
-        for lines in f:
-            tmp = str(re.findall(_patternd[opt], str(re.findall(_patterns[opt], lines)))).strip("[']")
-            with open(opt + '.log', 'a') as f:
-                f.write(tmp + '\n')
-
-def gen_ghsav():
-    with open(path + '/' + 'wu.log', 'r') as f:
-        for line in f:
-            tmp = round(float(line.strip()) / 60 * 2**32 / 10**9, 3)
-            with open('ghsav.log', 'a') as f:
-                f.write(str(tmp) + '\n')
-
-def power_rate():
-    os.system("paste ghsav.log power.log | awk '{printf ('%.3f\n', ($2 / $1))}' > ph.log")
-
-def result_files():
-    os.system("paste -d, ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log >> result-miner.csv")
-    os.system("rm ghsmm.log temp.log tmax.log wu.log dh.log power.log iout.log ghsav.log")
-
-def debuglog_files(ip_dirs):
+def debuglog_files(ip_dirs, ip):
     datas = remote.remote_cmd(ip, 0)
     path = '%s/estats.log' % ip_dirs
     with open(path, 'w+') as f:
@@ -76,17 +54,50 @@ def debuglog_files(ip_dirs):
     time.sleep(1)
 
 def handle_debuglog(ip_dirs, ip, freq, volt_level):
+    global dirs
+
     date = datetime.datetime.now().strftime('%Y.%m%d.%H%M%S')
     subdirs = ip + '-' + date + '-' + freq + '-' + volt_level
-    path = ip_dirs + '/' + subdirs
-    os.mkdirs('%s' % path)
+    dirs = ip_dirs + '/' + subdirs
+    os.mkdir('%s' % dirs)
 
     # Grep debuglog datas
-    os.system('cat %s/estats.log | grep "\[MM ID" > ./%s/%s/CGMiner_Debug.log' % (dirs, dirs, subdirs))
-    os.system('cat %s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log' % (dirs, dirs, subdirs))
-    os.system('cat %s/summary.log | grep -v Reply  > ./%s/%s/CGMiner_Summary.log' % (dirs, dirs, subdirs))
+    os.system('cat %s/estats.log | grep "\[MM ID" > ./%s/CGMiner_Debug.log' % (ip_dirs, dirs))
+    os.system('cat %s/edevs.log | grep -v Reply  > ./%s/CGMiner_Edevs.log' % (ip_dirs, dirs))
+    os.system('cat %s/summary.log | grep -v Reply  > ./%s/CGMiner_Summary.log' % (ip_dirs, dirs))
+
+def read_debuglog(opt):
+    with open(dirs + '/' + 'CGMiner_Debug.log', 'r') as f:
+        for lines in f:
+            tmp = str(re.findall(_patternd[opt], str(re.findall(_patterns[opt], lines)))).strip("[']")
+            with open(opt + '.log', 'a') as f:
+                f.write(tmp + '\n')
+
+def gen_ghsav():
+    with open('wu.log', 'r') as f:
+        for line in f:
+            tmp = round(float(line.strip()) / 60 * 2**32 / 10**9, 3)
+            with open('ghsav.log', 'a') as f:
+                f.write(str(tmp) + '\n')
+
+def power_ghsav():
+    with open('power.log') as f1, open('ghsav.log') as f2:
+            power = f1.read()
+            ghsav = f2.read()
+
+    length = len(power.strip().split())
+    with open('pg.log', 'a') as f:
+        for i in range(length):
+            f.write(str(round(float(power.strip().split()[i]) / float(ghsav.strip().split()[i]), 3)))
+            f.write('\n')
+
+def result_files():
+    os.system("paste -d, ghsmm.log temp.log tmax.log wu.log ghsav.log iout.log power.log pg.log dh.log >> result-miner.csv")
+    #os.system("rm ghsmm.log temp.log tmax.log wu.log ghsav.log iout.log power.log ph.log dh.log ")
+    os.system("echo '\n' >> result-miner.csv")
 
 if __name__ == '__main__':
+
     ip = sys.argv[1]
     freq = sys.argv[2]
     volt_level = sys.argv[3]

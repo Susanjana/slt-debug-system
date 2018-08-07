@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8; -*-
 
 
 import logging
@@ -16,7 +17,7 @@ def make_ip_dirs():
 
     ip_dirs = "result" + "-" + config.config['ip']
     logging.debug('ip dir = %s', ip_dirs)
-    os.mkdirs(ip_dirs)
+    os.mkdir(ip_dirs)
 
 if __name__ == '__main__':
     make_ip_dirs()
@@ -33,6 +34,9 @@ if __name__ == '__main__':
     # Remote get cgminer file
     remote.remote_scp(ip, 0)
     time.sleep(3)
+
+    # Create csv file
+    os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, P/G, DH >> result-miner.csv")
 
     for tmp in options:
         tmp = "'%s'" % tmp
@@ -52,7 +56,7 @@ if __name__ == '__main__':
 
         # Debuglog messages
         index = 0
-        debuglog.debuglog_files(ip_dirs)
+        debuglog.debuglog_files(ip_dirs, ip)
         freq = list(config.config['options'])[index].split()[1]
         volt = list(config.config['options'])[index].split()[3]
         debuglog.handle_debuglog(ip_dirs, ip, freq, volt)
@@ -71,6 +75,7 @@ if __name__ == '__main__':
 
     # Remove cgminer file
     os.system("rm ./cgminer")
+    os.system("rm ./*.pyc")
 
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++  Done  ++++++++++++++++++++++++++++++++++++++++++++\033[0m")

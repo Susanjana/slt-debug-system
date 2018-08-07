@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8; -*-
+
 
 config = {
     'time': 60,
 
-    'ip': '192.168.1.249',
+    'ip': '192.168.1.238',
 
     'options': {
         '--avalon8-freq 0:0:0:0:0:0:600 --avalon8-voltage-level 10 --avalon8-freq-sel 6 --avalon8-smart-speed 0',
