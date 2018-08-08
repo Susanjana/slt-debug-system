@@ -2,41 +2,39 @@
 # -*- coding: utf-8; -*-
 
 
-import logging
 import time
 import os
 import config
 import remote
 import debuglog
 
-# Config logging level
-logging.basicConfig(level=logging.DEBUG)
-
 def make_ip_dirs():
     global ip_dirs
 
     ip_dirs = "result" + "-" + config.config['ip']
-    logging.debug('ip dir = %s', ip_dirs)
     os.mkdir(ip_dirs)
 
 if __name__ == '__main__':
     make_ip_dirs()
 
     times = config.config['time']
-    logging.debug('times = %s', times)
+    print('Times: %s' % times)
 
     ip = config.config['ip']
-    logging.debug('ip = %s', ip)
+    print('IP: %s' % ip)
 
     options = config.config['options']
-    logging.debug('options = %s', options)
+    print('Options: %s' % options)
+
+    # Change current directory
+    os.chdir(ip_dirs)
 
     # Remote get cgminer file
     remote.remote_scp(ip, 0)
     time.sleep(3)
 
     # Create csv file
-    os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, P/G, DH >> result-miner.csv")
+    os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH >> result-miner.csv")
 
     for tmp in options:
         tmp = "'%s'" % tmp
@@ -56,10 +54,10 @@ if __name__ == '__main__':
 
         # Debuglog messages
         index = 0
-        debuglog.debuglog_files(ip_dirs, ip)
+        debuglog.debuglog_files(ip)
         freq = list(config.config['options'])[index].split()[1]
         volt = list(config.config['options'])[index].split()[3]
-        debuglog.handle_debuglog(ip_dirs, ip, freq, volt)
+        debuglog.handle_debuglog(ip, freq, volt)
         index += 1
 
         debuglog.read_debuglog('ghsmm')
@@ -70,12 +68,10 @@ if __name__ == '__main__':
         debuglog.read_debuglog('power')
         debuglog.read_debuglog('iout')
         debuglog.gen_ghsav()
-        debuglog.power_rate()
         debuglog.result_files()
 
     # Remove cgminer file
     os.system("rm ./cgminer")
-    os.system("rm ./*.pyc")
 
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++  Done  ++++++++++++++++++++++++++++++++++++++++++++\033[0m")
