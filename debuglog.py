@@ -2,13 +2,14 @@
 # -*- coding: utf-8; -*-
 
 
-import datetime
-import sys
-import config
 import os
-import remote
-import time
 import re
+import sys
+import time
+import datetime
+
+import config
+import remote
 
 _patterns = {
     'ghsmm': "GHSmm\[[0-9]{1,6}\.[0-9]{1,2}\]",

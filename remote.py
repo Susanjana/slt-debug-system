@@ -2,12 +2,10 @@
 # -*- coding: utf-8; -*-
 
 
-from __future__ import print_function
-import telnetlib
+import os
 import sys
 import time
 import paramiko
-import os
 
 def remote_cmd(ip, cmd, para):
     v = None
