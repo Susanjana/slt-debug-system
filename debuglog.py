@@ -15,9 +15,9 @@ _patterns = {
     'temp': "Temp\[[0-9]{1,6}\]",
     'tmax': "TMax\[[0-9]{1,6}\]",
     'wu': "WU\[[0-9]{1,6}\.[0-9]{1,2}\]",
+    'dh': "DH\[[0-9]{1,3}\.[0-9]{1,3}\%\]",
     'iout': "Iout\[[0-9]{1,3}\.[0-9]{1,3}\]",
     'power': "Power\[[0-9]{1,3}\.[0-9]{1,3}\]",
-    'dh': "DH\[[0-9]{1,3}\.[0-9]{1,3}\%\]",
 }
 
 _patternd = {
@@ -25,9 +25,9 @@ _patternd = {
     'temp': "[0-9]{1,6}",
     'tmax': "[0-9]{1,6}",
     'wu': "[0-9]{1,6}\.[0-9]{1,2}",
+    'dh': "[0-9]{1,3}\.[0-9]{1,3}",
     'iout': "[0-9]{1,3}\.[0-9]{1,3}",
     'power': "[0-9]{1,3}\.[0-9]{1,3}",
-    'dh': "[0-9]{1,3}\.[0-9]{1,3}",
 }
 
 def debuglog_files(ip_dirs, ip):
@@ -74,14 +74,13 @@ def power_ghsav(ip_dirs):
             power = f1.read()
             ghsav = f2.read()
 
-    length = len(power.strip().split())
-    with open('pg.log', 'a') as f:
-        for i in range(length):
-            f.write(str(round(float(power.strip().split()[i]) / float(ghsav.strip().split()[i]), 3)))
-            f.write('\n')
+    l = len(power.strip().split())
+    with open(ip_dirs + '/' + 'pg.log', 'a') as f:
+        for i in range(l):
+            f.write(str(round(float(power.split()[i]) / float(ghsav.split()[i]), 3)) + '\n')
 
 def result_files(ip_dirs):
-    os.system("paste -d, ./%s/ghsmm.log ./%s/temp.log ./%s/tmax.log ./%s/wu.log ./%s/ghsav.log ./%s/iout.log ./%s/power.log ./%s/dh.log >> ./%s/result-miner.csv" \
-                % (ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs))
+    os.system("paste -d, ./%s/ghsmm.log ./%s/temp.log ./%s/tmax.log ./%s/wu.log ./%s/ghsav.log ./%s/dh.log ./%s/iout.log ./%s/power.log ./%s/pg.log >> ./%s/result-miner.csv" \
+                % (ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs))
     os.system("rm ./%s/*log" % ip_dirs)
     os.system("echo '\n' >> ./%s/result-miner.csv" % ip_dirs)

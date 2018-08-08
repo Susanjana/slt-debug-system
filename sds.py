@@ -65,10 +65,11 @@ def get_datas_handle(ip):
         debuglog.read_debuglog(ip_dirs, 'power')
         debuglog.read_debuglog(ip_dirs, 'iout')
         debuglog.gen_ghsav(ip_dirs)
+        power_ghsav(ip_dirs)
         debuglog.result_files(ip_dirs)
 
     # Remove cgminer file
-    os.system("rm result-%s/cgminer" % ip)
+    os.system("rm ./%s/cgminer" % ip_dirs)
     show_done(ip)
 
 if __name__ == '__main__':
@@ -82,3 +83,5 @@ if __name__ == '__main__':
 
     for thr in threads:
         thr.join()
+
+    os.system("rm *.pyc")
