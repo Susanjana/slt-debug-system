@@ -30,23 +30,20 @@ _patternd = {
     'dh': "[0-9]{1,3}\.[0-9]{1,3}",
 }
 
-def debuglog_files(ip):
+def debuglog_files(ip_dirs, ip):
     datas = remote.remote_cmd(ip, 0)
-    with open('estats.log', 'w+') as f:
+    with open(ip_dirs + '/' + 'estats.log', 'w+') as f:
         f.write(str(datas))
-    time.sleep(1)
 
     datas = remote.remote_cmd(ip, 1)
-    with open('edevs.log', 'w+') as f:
+    with open(ip_dirs + '/' + 'edevs.log', 'w+') as f:
         f.write(str(datas))
-    time.sleep(1)
 
     datas = remote.remote_cmd(ip, 2)
-    with open('summary.log', 'w+') as f:
+    with open(ip_dirs + '/' + 'summary.log', 'w+') as f:
         f.write(str(datas))
-    time.sleep(1)
 
-def handle_debuglog(ip, freq, volt_level):
+def handle_debuglog(ip_dirs, ip, freq, volt_level):
     global subdirs
 
     date = datetime.datetime.now().strftime('%Y.%m%d.%H%M%S')
@@ -54,22 +51,22 @@ def handle_debuglog(ip, freq, volt_level):
     os.mkdir('%s' % subdirs)
 
     # Grep debuglog datas
-    os.system('cat estats.log | grep "\[MM ID" > ./%s/CGMiner_Debug.log' % subdirs)
-    os.system('cat edevs.log | grep -v Reply  > ./%s/CGMiner_Edevs.log' % subdirs)
-    os.system('cat summary.log | grep -v Reply  > ./%s/CGMiner_Summary.log' % subdirs)
+    os.system('cat ./%s/estats.log | grep "\[MM ID" > ./%s/%s/CGMiner_Debug.log' % (ip_dirs, ip_dirs, subdirs))
+    os.system('cat ./%s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log' % (ip_dirs, ip_dirs, subdirs))
+    os.system('cat ./%s/summary.log | grep -v Reply  > ./%s/%s/CGMiner_Summary.log' % (ip_dirs, ip_dirs, subdirs))
 
-def read_debuglog(opt):
-    with open(subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
+def read_debuglog(ip_dirs, opt):
+    with open(ip_dirs + '/' + subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
         for lines in f:
             tmp = str(re.findall(_patternd[opt], str(re.findall(_patterns[opt], lines)))).strip("[']")
-            with open(opt + '.log', 'a') as f:
+            with open(ip_dirs + '/' + opt + '.log', 'a') as f:
                 f.write(tmp + '\n')
 
-def gen_ghsav():
-    with open('wu.log', 'r') as f:
+def gen_ghsav(ip_dirs):
+    with open(ip_dirs + '/' + 'wu.log', 'r') as f:
         for line in f:
             tmp = round(float(line.strip()) / 60 * 2**32 / 10**9, 3)
-            with open('ghsav.log', 'a') as f:
+            with open(ip_dirs + '/' + 'ghsav.log', 'a') as f:
                 f.write(str(tmp) + '\n')
 
 def power_ghsav(ip_dirs):
@@ -83,7 +80,8 @@ def power_ghsav(ip_dirs):
             f.write(str(round(float(power.strip().split()[i]) / float(ghsav.strip().split()[i]), 3)))
             f.write('\n')
 
-def result_files():
-    os.system("paste -d, ghsmm.log temp.log tmax.log wu.log ghsav.log iout.log power.log dh.log >> result-miner.csv")
-    os.system("rm ghsmm.log temp.log tmax.log wu.log ghsav.log iout.log power.log dh.log ")
-    os.system("echo '\n' >> result-miner.csv")
+def result_files(ip_dirs):
+    os.system("paste -d, ./%s/ghsmm.log ./%s/temp.log ./%s/tmax.log ./%s/wu.log ./%s/ghsav.log ./%s/iout.log ./%s/power.log ./%s/dh.log >> ./%s/result-miner.csv" \
+                % (ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs))
+    os.system("rm ./%s/*log" % ip_dirs)
+    os.system("echo '\n' >> ./%s/result-miner.csv" % ip_dirs)

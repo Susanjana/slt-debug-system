@@ -26,8 +26,6 @@ def get_datas_handle(ip):
     options = config.config['options']
     print('Options: %s' % options)
 
-    os.chdir(ip_dirs)
-
     # Remote get cgminer file
     remote.remote_scp(ip, 0)
     time.sleep(3)
@@ -59,29 +57,28 @@ def get_datas_handle(ip):
         debuglog.handle_debuglog(ip, freq, volt)
         index += 1
 
-        debuglog.read_debuglog('ghsmm')
-        debuglog.read_debuglog('temp')
-        debuglog.read_debuglog('tmax')
-        debuglog.read_debuglog('wu')
-        debuglog.read_debuglog('dh')
-        debuglog.read_debuglog('power')
-        debuglog.read_debuglog('iout')
-        debuglog.gen_ghsav()
-        debuglog.result_files()
+        debuglog.read_debuglog(ip_dirs, 'ghsmm')
+        debuglog.read_debuglog(ip_dirs, 'temp')
+        debuglog.read_debuglog(ip_dirs, 'tmax')
+        debuglog.read_debuglog(ip_dirs, 'wu')
+        debuglog.read_debuglog(ip_dirs, 'dh')
+        debuglog.read_debuglog(ip_dirs, 'power')
+        debuglog.read_debuglog(ip_dirs, 'iout')
+        debuglog.gen_ghsav(ip_dirs)
+        debuglog.result_files(ip_dirs)
 
     # Remove cgminer file
-    os.system("rm ./cgminer")
-    os.chdir("../")
+    os.system("rm result-%s/cgminer" % ip)
     show_done(ip)
 
 if __name__ == '__main__':
     threads = []
 
-    ips = str(config.config['ip'])
+    ips = list(config.config['ip'])
     for line in ips:
         thr = threading.Thread(target=get_datas_handle, args=(line,))
         thr.start()
         threads.append(thr)
 
-        for thr in threads:
-            thr.join()
+    for thr in threads:
+        thr.join()
