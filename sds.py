@@ -31,15 +31,15 @@ def get_datas_handle(ip):
     time.sleep(3)
 
     # Create csv file
-    os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH >> result-miner.csv")
+    os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH >> ./%s/result-miner.csv" % ip_dirs)
     index = 0
 
     for tmp in options:
         tmp = "'%s'" % tmp
-        if not os.system('cat cgminer | grep more_options'):
-            os.system('more_options=`cat cgminer | grep more_options`; sed -i "s/$more_options/        option more_options     %s/g" cgminer' % tmp)
+        if not os.system('cat ./%s/cgminer | grep more_options' % ip_dirs):
+            os.system('more_options=`cat ./%s/cgminer | grep more_options`; sed -i "s/$more_options/        option more_options     %s/g" ./%s/cgminer' % (ip_dirs, tmp, ip_dirs))
         else:
-            os.system("echo '       option more_options %s' >> cgminer" % tmp)
+            os.system("echo '       option more_options %s' >> ./%s/cgminer" % (tmp, ip_dirs))
         time.sleep(5)
 
         # Send cgminer file to remote
