@@ -5,7 +5,10 @@
 config = {
     'time': 180,
 
-    'ip': '192.168.1.238',
+    'ip': {
+        '192.168.1.238',
+        '192.168.1.240',
+    },
 
     'options': {
         '--avalon8-freq 0:0:0:0:0:0:600 --avalon8-voltage-level 10 --avalon8-freq-sel 6 --avalon8-smart-speed 0',

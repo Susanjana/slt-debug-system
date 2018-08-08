@@ -32,20 +32,17 @@ _patternd = {
 
 def debuglog_files(ip):
     datas = remote.remote_cmd(ip, 0)
-    path = 'estats.log'
-    with open(path, 'w+') as f:
+    with open('estats.log', 'w+') as f:
         f.write(str(datas))
     time.sleep(1)
 
     datas = remote.remote_cmd(ip, 1)
-    path = 'edevs.log'
-    with open(path, 'w+') as f:
+    with open('edevs.log', 'w+') as f:
         f.write(str(datas))
     time.sleep(1)
 
     datas = remote.remote_cmd(ip, 2)
-    path = 'summary.log'
-    with open(path, 'w+') as f:
+    with open('summary.log', 'w+') as f:
         f.write(str(datas))
     time.sleep(1)
 

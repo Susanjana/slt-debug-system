@@ -7,26 +7,25 @@ import os
 import config
 import remote
 import debuglog
+import threading
+import sys
 
-def make_ip_dirs():
-    global ip_dirs
+def show_done(ip):
+    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
+    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++  %s Done  ++++++++++++++++++++++++++++++++++++++++++++\033[0m" % ip)
+    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
 
-    ip_dirs = "result" + "-" + config.config['ip']
+
+def get_datas_handle(ip):
+    ip_dirs = "result" + "-" + ip
     os.mkdir(ip_dirs)
-
-if __name__ == '__main__':
-    make_ip_dirs()
 
     times = config.config['time']
     print('Times: %s' % times)
 
-    ip = config.config['ip']
-    print('IP: %s' % ip)
-
     options = config.config['options']
     print('Options: %s' % options)
 
-    # Change current directory
     os.chdir(ip_dirs)
 
     # Remote get cgminer file
@@ -35,6 +34,7 @@ if __name__ == '__main__':
 
     # Create csv file
     os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH >> result-miner.csv")
+    index = 0
 
     for tmp in options:
         tmp = "'%s'" % tmp
@@ -53,7 +53,6 @@ if __name__ == '__main__':
         time.sleep(times)
 
         # Debuglog messages
-        index = 0
         debuglog.debuglog_files(ip)
         freq = list(config.config['options'])[index].split()[1]
         volt = list(config.config['options'])[index].split()[3]
@@ -72,7 +71,17 @@ if __name__ == '__main__':
 
     # Remove cgminer file
     os.system("rm ./cgminer")
+    os.chdir("../")
+    show_done(ip)
 
-    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
-    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++  Done  ++++++++++++++++++++++++++++++++++++++++++++\033[0m")
-    print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
+if __name__ == '__main__':
+    threads = []
+
+    ips = str(config.config['ip'])
+    for line in ips:
+        thr = threading.Thread(target=get_datas_handle, args=(line,))
+        thr.start()
+        threads.append(thr)
+
+        for thr in threads:
+            thr.join()

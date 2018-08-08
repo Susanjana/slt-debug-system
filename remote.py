@@ -62,34 +62,3 @@ def remote_scp(ip, flag):
         return False
 
     return True
-
-if __name__ == '__main__':
-    ip = sys.argv[1]
-    flag = int(sys.argv[2])
-    mode = sys.argv[3]
-
-    if (mode == 's'):
-        if (remote_scp(ip, flag) != True):
-            print("scp files failed.")
-    elif (mode == 'r'):
-        datas = remote_cmd(ip, flag)
-        if datas is None:
-            print("Get datas failed.")
-            sys.exit(1)
-
-        if (flag == 0):
-            estats = open('estats.log', 'w+')
-            estats.write(str(datas))
-            estats.close()
-        elif (flag == 1):
-            estats = open('edevs.log', 'w+')
-            estats.write(str(datas))
-            estats.close()
-        elif (flag == 2):
-            estats = open('summary.log', 'w+')
-            estats.write(str(datas))
-            estats.close()
-        # Open debuglog do not have datas
-        # Reboot do not have datas
-    else:
-        print("mode error.")
