@@ -27,7 +27,7 @@ def get_datas_handle(ip):
     print('Options: %s' % options)
 
     # Remote get cgminer file
-    remote.remote_scp(ip, 0)
+    remote.remote_scp(ip, 'receive')
     time.sleep(3)
 
     # Create csv file
@@ -43,11 +43,11 @@ def get_datas_handle(ip):
         time.sleep(5)
 
         # Send cgminer file to remote
-        remote.remote_scp(ip, 1)
+        remote.remote_scp(ip, 'send')
         time.sleep(3)
 
         # Restart cgminer
-        remote.remote_cmd(ip, 4)
+        remote.remote_cmd(ip, '/etc/init.d/cgminer', 'restart')
         time.sleep(times)
 
         # Debuglog messages

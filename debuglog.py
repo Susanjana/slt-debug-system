@@ -31,16 +31,16 @@ _patternd = {
 }
 
 def debuglog_files(ip_dirs, ip):
-    datas = remote.remote_cmd(ip, 0)
-    with open(ip_dirs + '/' + 'estats.log', 'w+') as f:
+    datas = remote.remote_cmd(ip, 'cgminer-api', 'estats')
+    with open(ip_dirs + '/' + 'estats.log', 'w') as f:
         f.write(str(datas))
 
-    datas = remote.remote_cmd(ip, 1)
-    with open(ip_dirs + '/' + 'edevs.log', 'w+') as f:
+    datas = remote.remote_cmd(ip, 'cgminer-api', 'edevs')
+    with open(ip_dirs + '/' + 'edevs.log', 'w') as f:
         f.write(str(datas))
 
-    datas = remote.remote_cmd(ip, 2)
-    with open(ip_dirs + '/' + 'summary.log', 'w+') as f:
+    datas = remote.remote_cmd(ip, 'cgminer-api', 'summary')
+    with open(ip_dirs + '/' + 'summary.log', 'w') as f:
         f.write(str(datas))
 
 def handle_debuglog(ip_dirs, ip, freq, volt_level):
