@@ -16,6 +16,24 @@ def show_done(ip):
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++  %s Done  ++++++++++++++++++++++++++++++++++++++++++++\033[0m" % ip)
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
 
+def modify_cgminer(path, option):
+    flag = 0
+
+    with open(path, 'r') as f:
+        lines = f.readlines()
+
+    with open(path, 'w') as f:
+        for line in lines:
+            if 'more_options' in line:
+                line = line.replace(line, '\t' + option + '\n')
+                f.write(line)
+                flag = 1
+            else:
+                f.write(line)
+
+    if (flag == 0):
+        with open(path, 'a') as f:
+            f.write('\t' + option + '\n')
 
 def get_datas_handle(ip):
     ip_dirs = "result" + "-" + ip
@@ -36,11 +54,8 @@ def get_datas_handle(ip):
     index = 0
 
     for tmp in options:
-        tmp = "'%s'" % tmp
-        if not os.system('cat ./%s/cgminer | grep more_options' % ip_dirs):
-            os.system('more_options=`cat ./%s/cgminer | grep more_options`; sed -i "s/$more_options/        option more_options     %s/g" ./%s/cgminer' % (ip_dirs, tmp, ip_dirs))
-        else:
-            os.system("echo '       option more_options %s' >> ./%s/cgminer" % (tmp, ip_dirs))
+        # Modify cgminer file
+        modify_cgminer(ip_dirs + '/' + 'cgminer', tmp)
         time.sleep(5)
 
         # Send cgminer file to remote
