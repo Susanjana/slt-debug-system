@@ -52,10 +52,10 @@ def get_datas_handle(ip):
         time.sleep(times)
 
         # Debuglog messages
-        debuglog.debuglog_files(ip)
+        debuglog.debuglog_files(ip_dirs, ip)
         freq = list(config.config['options'])[index].split()[1]
         volt = list(config.config['options'])[index].split()[3]
-        debuglog.handle_debuglog(ip, freq, volt)
+        debuglog.handle_debuglog(ip_dirs, ip, freq, volt)
         index += 1
 
         debuglog.read_debuglog(ip_dirs, 'ghsmm')
