@@ -51,7 +51,7 @@ def get_datas_handle(ip):
     time.sleep(3)
 
     # Create csv file
-    os.system("echo Freq, Volt_level, GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH, Power/GHsav, Options >> ./%s/result-miner.csv" % ip_dirs)
+    os.system("echo Freq, Volt_level, GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH, Power/GHsav, DNA, Options >> ./%s/result-miner.csv" % ip_dirs)
     index = 0
 
     for tmp in options:
@@ -95,6 +95,7 @@ def get_datas_handle(ip):
         debuglog.read_debuglog(ip_dirs, subdirs, 'dh')
         debuglog.read_debuglog(ip_dirs, subdirs, 'power')
         debuglog.read_debuglog(ip_dirs, subdirs, 'iout')
+        debuglog.read_dna(ip_dirs, subdirs)
         debuglog.gen_ghsav(ip_dirs)
         debuglog.power_ghsav(ip_dirs)
         debuglog.result_files(ip_dirs)
