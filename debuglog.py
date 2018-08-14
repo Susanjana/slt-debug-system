@@ -45,23 +45,33 @@ def debuglog_files(ip_dirs, ip):
         f.write(str(datas))
 
 def read_debuglog(ip_dirs, subdirs, opt):
-    with open('./' + ip_dirs + '/' + subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
-        for lines in f:
-            tmp = str(re.findall(_patternd[opt], str(re.findall(_patterns[opt], lines)))).strip("[']")
-            with open(ip_dirs + '/' + opt + '.log', 'a') as f:
-                f.write(tmp + '\n')
+    try:
+        with open('./' + ip_dirs + '/' + subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
+            for lines in f:
+                tmp = str(re.findall(_patternd[opt], str(re.findall(_patterns[opt], lines)))).strip("[']")
+                with open(ip_dirs + '/' + opt + '.log', 'a') as f:
+                    f.write(tmp + '\n')
+    except:
+        pass
 
 def gen_ghsav(ip_dirs):
-    with open('./' + ip_dirs + '/' + 'wu.log', 'r') as f:
-        for line in f:
-            tmp = round(float(line.strip()) / 60 * 2**32 / 10**9, 3)
-            with open(ip_dirs + '/' + 'ghsav.log', 'a') as f:
-                f.write(str(tmp) + '\n')
+    try:
+        with open('./' + ip_dirs + '/' + 'wu.log', 'r') as f:
+            for line in f:
+                tmp = round(float(line.strip()) / 60 * 2**32 / 10**9, 3)
+                with open(ip_dirs + '/' + 'ghsav.log', 'a') as f:
+                    f.write(str(tmp) + '\n')
+    except:
+        pass
 
 def power_ghsav(ip_dirs):
-    with open(ip_dirs + '/' + 'power.log') as f1, open(ip_dirs + '/' + 'ghsav.log') as f2:
-            power = f1.read()
-            ghsav = f2.read()
+    try:
+        with open(ip_dirs + '/' + 'power.log') as f1, open(ip_dirs + '/' + 'ghsav.log') as f2:
+                power = f1.read()
+                ghsav = f2.read()
+    except:
+        power = '0'
+        ghsav = '0'
 
     l = len(power.strip().split())
     with open(ip_dirs + '/' + 'pg.log', 'a') as f:
