@@ -51,7 +51,7 @@ def get_datas_handle(ip):
     time.sleep(3)
 
     # Create csv file
-    os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH, Power/GHsav >> ./%s/result-miner.csv" % ip_dirs)
+    os.system("echo Freq, Volt_level, GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH, Power/GHsav, Options >> ./%s/result-miner.csv" % ip_dirs)
     index = 0
 
     for tmp in options:
@@ -78,6 +78,10 @@ def get_datas_handle(ip):
         date = datetime.datetime.now().strftime('%Y.%m%d.%H%M%S')
         subdirs = ip + '-' + date + '-' + freq + '-' + volt_level
         os.mkdir('./%s/%s' % (ip_dirs, subdirs))
+        # Freq, Volt_level and more_options
+        os.system("echo %s > ./%s/freq.log" % (freq, ip_dirs))
+        os.system("echo %s > ./%s/volt.log" % (volt_level, ip_dirs))
+        os.system("echo %s > ./%s/options.log" % (tmp.strip("'"), ip_dirs))
         # Grep debuglog datas
         os.system("cat ./%s/estats.log | grep '\[MM ID' > ./%s/%s/CGMiner_Debug.log" % (ip_dirs, ip_dirs, subdirs))
         os.system("cat ./%s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log" % (ip_dirs, ip_dirs, subdirs))

@@ -82,7 +82,8 @@ def power_ghsav(ip_dirs):
                 f.write('0')
 
 def result_files(ip_dirs):
-    os.system("paste -d, ./%s/ghsmm.log ./%s/temp.log ./%s/tmax.log ./%s/wu.log ./%s/ghsav.log ./%s/dh.log ./%s/iout.log ./%s/power.log ./%s/pg.log >> ./%s/result-miner.csv" \
-                % (ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs))
+    os.system("paste -d, ./%s/freq.log ./%s/volt.log ./%s/ghsmm.log ./%s/temp.log ./%s/tmax.log ./%s/wu.log \
+                ./%s/ghsav.log ./%s/dh.log ./%s/iout.log ./%s/power.log ./%s/pg.log ./%s/options.log >> ./%s/result-miner.csv" \
+                % (ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs))
     os.system("rm ./%s/*log" % ip_dirs)
     os.system("echo '\n' >> ./%s/result-miner.csv" % ip_dirs)
