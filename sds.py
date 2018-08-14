@@ -5,6 +5,7 @@
 import os
 import sys
 import time
+import datetime
 import threading
 
 import config
@@ -50,12 +51,16 @@ def get_datas_handle(ip):
     time.sleep(3)
 
     # Create csv file
-    os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH >> ./%s/result-miner.csv" % ip_dirs)
+    os.system("echo GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH, Power/GHsav >> ./%s/result-miner.csv" % ip_dirs)
     index = 0
 
     for tmp in options:
         # Modify cgminer file
-        modify_cgminer(ip_dirs + '/' + 'cgminer', tmp)
+        tmp = "'%s'" % tmp
+        if not os.system('cat ./%s/cgminer | grep more_options' % ip_dirs):
+            os.system('more_options=`cat ./%s/cgminer | grep more_options`; sed -i "s/$more_options/        option more_options     %s/g" ./%s/cgminer' % (ip_dirs, tmp, ip_dirs))
+        else:
+            os.system("echo '       option more_options %s' >> ./%s/cgminer" % (tmp, ip_dirs))
         time.sleep(5)
 
         # Send cgminer file to remote
@@ -69,19 +74,25 @@ def get_datas_handle(ip):
         # Debuglog messages
         debuglog.debuglog_files(ip_dirs, ip)
         freq = list(config.config['options'])[index].split()[1]
-        volt = list(config.config['options'])[index].split()[3]
-        debuglog.handle_debuglog(ip_dirs, ip, freq, volt)
+        volt_level = list(config.config['options'])[index].split()[3]
+        date = datetime.datetime.now().strftime('%Y.%m%d.%H%M%S')
+        subdirs = ip + '-' + date + '-' + freq + '-' + volt_level
+        os.mkdir('./%s/%s' % (ip_dirs, subdirs))
+        # Grep debuglog datas
+        os.system("cat ./%s/estats.log | grep '\[MM ID' > ./%s/%s/CGMiner_Debug.log" % (ip_dirs, ip_dirs, subdirs))
+        os.system("cat ./%s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log" % (ip_dirs, ip_dirs, subdirs))
+        os.system("cat ./%s/summary.log | grep -v Reply  > ./%s/%s/CGMiner_Summary.log" % (ip_dirs, ip_dirs, subdirs))
         index += 1
 
-        debuglog.read_debuglog(ip_dirs, 'ghsmm')
-        debuglog.read_debuglog(ip_dirs, 'temp')
-        debuglog.read_debuglog(ip_dirs, 'tmax')
-        debuglog.read_debuglog(ip_dirs, 'wu')
-        debuglog.read_debuglog(ip_dirs, 'dh')
-        debuglog.read_debuglog(ip_dirs, 'power')
-        debuglog.read_debuglog(ip_dirs, 'iout')
+        debuglog.read_debuglog(ip_dirs, subdirs, 'ghsmm')
+        debuglog.read_debuglog(ip_dirs, subdirs, 'temp')
+        debuglog.read_debuglog(ip_dirs, subdirs, 'tmax')
+        debuglog.read_debuglog(ip_dirs, subdirs, 'wu')
+        debuglog.read_debuglog(ip_dirs, subdirs, 'dh')
+        debuglog.read_debuglog(ip_dirs, subdirs, 'power')
+        debuglog.read_debuglog(ip_dirs, subdirs, 'iout')
         debuglog.gen_ghsav(ip_dirs)
-        power_ghsav(ip_dirs)
+        debuglog.power_ghsav(ip_dirs)
         debuglog.result_files(ip_dirs)
 
     # Remove cgminer file

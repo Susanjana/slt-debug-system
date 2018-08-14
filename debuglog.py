@@ -44,27 +44,15 @@ def debuglog_files(ip_dirs, ip):
     with open(ip_dirs + '/' + 'summary.log', 'w') as f:
         f.write(str(datas))
 
-def handle_debuglog(ip_dirs, ip, freq, volt_level):
-    global subdirs
-
-    date = datetime.datetime.now().strftime('%Y.%m%d.%H%M%S')
-    subdirs = ip + '-' + date + '-' + freq + '-' + volt_level
-    os.mkdir('%s' % subdirs)
-
-    # Grep debuglog datas
-    os.system('cat ./%s/estats.log | grep "\[MM ID" > ./%s/%s/CGMiner_Debug.log' % (ip_dirs, ip_dirs, subdirs))
-    os.system('cat ./%s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log' % (ip_dirs, ip_dirs, subdirs))
-    os.system('cat ./%s/summary.log | grep -v Reply  > ./%s/%s/CGMiner_Summary.log' % (ip_dirs, ip_dirs, subdirs))
-
-def read_debuglog(ip_dirs, opt):
-    with open(ip_dirs + '/' + subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
+def read_debuglog(ip_dirs, subdirs, opt):
+    with open('./' + ip_dirs + '/' + subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
         for lines in f:
             tmp = str(re.findall(_patternd[opt], str(re.findall(_patterns[opt], lines)))).strip("[']")
             with open(ip_dirs + '/' + opt + '.log', 'a') as f:
                 f.write(tmp + '\n')
 
 def gen_ghsav(ip_dirs):
-    with open(ip_dirs + '/' + 'wu.log', 'r') as f:
+    with open('./' + ip_dirs + '/' + 'wu.log', 'r') as f:
         for line in f:
             tmp = round(float(line.strip()) / 60 * 2**32 / 10**9, 3)
             with open(ip_dirs + '/' + 'ghsav.log', 'a') as f:
@@ -78,10 +66,13 @@ def power_ghsav(ip_dirs):
     l = len(power.strip().split())
     with open(ip_dirs + '/' + 'pg.log', 'a') as f:
         for i in range(l):
-            f.write(str(round(float(power.split()[i]) / float(ghsav.split()[i]), 3)) + '\n')
+            try:
+                f.write(str(round(float(power.split()[i]) / float(ghsav.split()[i]), 3)) + '\n')
+            except:
+                f.write('0')
 
 def result_files(ip_dirs):
     os.system("paste -d, ./%s/ghsmm.log ./%s/temp.log ./%s/tmax.log ./%s/wu.log ./%s/ghsav.log ./%s/dh.log ./%s/iout.log ./%s/power.log ./%s/pg.log >> ./%s/result-miner.csv" \
-                % (ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs))
+                % (ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs, ip_dirs))
     os.system("rm ./%s/*log" % ip_dirs)
     os.system("echo '\n' >> ./%s/result-miner.csv" % ip_dirs)
