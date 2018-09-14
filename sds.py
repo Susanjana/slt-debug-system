@@ -3,19 +3,21 @@
 
 
 import os
+import re
 import sys
 import time
 import datetime
 import threading
 
-import config
 import remote
 import debuglog
+
 
 def show_done(ip):
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++  %s Done  ++++++++++++++++++++++++++++++++++++++++++++\033[0m" % ip)
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
+
 
 def modify_cgminer(path, option):
     flag = 0
@@ -36,7 +38,8 @@ def modify_cgminer(path, option):
         with open(path, 'a') as f:
             f.write('\t' + option + '\n')
 
-def get_datas_handle(ip):
+
+def setup(ip):
     ip_dirs = "result" + "-" + ip
     os.mkdir(ip_dirs)
 
@@ -104,12 +107,47 @@ def get_datas_handle(ip):
     os.system("rm ./%s/cgminer" % ip_dirs)
     show_done(ip)
 
+
+def read_config():
+    ''' Read time, ip, options form slt-options.conf '''
+
+    global time
+    global ips
+    option = []
+
+    path = 'slt-options.conf'
+    line_cnt = 1
+
+    with open(path) as f:
+        for line in f:
+            tmp = re.search('^\s*#', line)
+            if tmp or line == '\n':
+                continue
+
+            if line_cnt == 1:
+                time = line.strip()
+            elif line_cnt == 2:
+                ip = line.strip()
+            elif line_cnt >= 3:
+                option.append(line.strip())
+            line_cnt += 1
+
+    print("time: %s" % time)
+    print("ip: %s" % ip)
+    print(option)
+
+    return option
+
+
 if __name__ == '__main__':
     threads = []
 
+    read_config()
+
+    # According to ip number, creating threads
     ips = list(config.config['ip'])
     for line in ips:
-        thr = threading.Thread(target=get_datas_handle, args=(line,))
+        thr = threading.Thread(target=setup, args=(line,))
         thr.start()
         threads.append(thr)
 

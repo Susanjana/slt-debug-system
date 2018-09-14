@@ -8,7 +8,6 @@ import sys
 import time
 import datetime
 
-import config
 import remote
 
 _patterns = {
