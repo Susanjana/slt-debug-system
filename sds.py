@@ -8,9 +8,13 @@ import sys
 import time
 import datetime
 import threading
+import logging
 
 import remote
 import debuglog
+
+# Setting logging level
+logging.basicConfig(level=logging.INFO)
 
 
 def show_done(ip):
@@ -111,41 +115,42 @@ def setup(ip):
 def read_config():
     ''' Read time, ip, options form slt-options.conf '''
 
-    global time
-    global ips
-    option = []
+    ips = []
+    options = []
 
     path = 'slt-options.conf'
-    line_cnt = 1
+    option_flag = 0
 
     with open(path) as f:
         for line in f:
-            tmp = re.search('^\s*#', line)
-            if tmp or line == '\n':
+            if line == '\n':
                 continue
 
-            if line_cnt == 1:
+            tmp = re.search('^\s*#', line)
+            if tmp:
+                option_flag += 1
+                continue
+
+            if option_flag == 1:
                 time = line.strip()
-            elif line_cnt == 2:
-                ip = line.strip()
-            elif line_cnt >= 3:
-                option.append(line.strip())
-            line_cnt += 1
+            elif option_flag == 2:
+                ips.append(line.strip())
+            elif option_flag == 3:
+                options.append(line.strip())
 
-    print("time: %s" % time)
-    print("ip: %s" % ip)
-    print(option)
-
-    return option
+    return time, ips, options
 
 
 if __name__ == '__main__':
     threads = []
 
-    read_config()
+    # Read Config file
+    time, ips, options = read_config()
+    logging.debug("time: %s", time)
+    logging.debug("ips: %s", str(ips))
+    logging.debug("options: %s", str(options))
 
     # According to ip number, creating threads
-    ips = list(config.config['ip'])
     for line in ips:
         thr = threading.Thread(target=setup, args=(line,))
         thr.start()
