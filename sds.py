@@ -23,35 +23,9 @@ def show_done(ip):
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
 
 
-def modify_cgminer(path, option):
-    flag = 0
-
-    with open(path, 'r') as f:
-        lines = f.readlines()
-
-    with open(path, 'w') as f:
-        for line in lines:
-            if 'more_options' in line:
-                line = line.replace(line, '\t' + option + '\n')
-                f.write(line)
-                flag = 1
-            else:
-                f.write(line)
-
-    if (flag == 0):
-        with open(path, 'a') as f:
-            f.write('\t' + option + '\n')
-
-
 def setup(ip):
     ip_dirs = "result" + "-" + ip
     os.mkdir(ip_dirs)
-
-    times = config.config['time']
-    print('Times: %s' % times)
-
-    options = config.config['options']
-    print('Options: %s' % options)
 
     # Remote get cgminer file
     remote.remote_scp(ip, 'receive')
@@ -76,7 +50,7 @@ def setup(ip):
 
         # Restart cgminer
         remote.remote_cmd(ip, '/etc/init.d/cgminer', 'restart')
-        time.sleep(times)
+        time.sleep(time)
 
         # Debuglog messages
         debuglog.debuglog_files(ip_dirs, ip)
@@ -143,6 +117,8 @@ def read_config():
 
 if __name__ == '__main__':
     threads = []
+    global options
+    global time
 
     # Read Config file
     time, ips, options = read_config()

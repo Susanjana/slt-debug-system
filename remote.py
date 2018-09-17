@@ -34,6 +34,7 @@ def remote_cmd(ip, cmd, para):
         break
     return v
 
+
 def remote_scp(ip, mode):
     if (mode == 'receive'):
         os.system("scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@%s:/etc/config/cgminer ./result-%s/cgminer" % (ip, ip))

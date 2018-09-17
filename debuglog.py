@@ -30,6 +30,7 @@ _patternd = {
     'power': "[0-9]{1,3}\.[0-9]{1,3}",
 }
 
+
 def debuglog_files(ip_dirs, ip):
     datas = remote.remote_cmd(ip, 'cgminer-api', 'estats')
     with open(ip_dirs + '/' + 'estats.log', 'w') as f:
@@ -46,6 +47,7 @@ def debuglog_files(ip_dirs, ip):
         f.write(str(datas))
     time.sleep(1)
 
+
 def read_debuglog(ip_dirs, subdirs, opt):
     try:
         with open('./' + ip_dirs + '/' + subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
@@ -57,9 +59,11 @@ def read_debuglog(ip_dirs, subdirs, opt):
     except:
         pass
 
+
 def read_dna(ip_dirs, subdirs):
     os.system("cat ./%s/%s/CGMiner_Debug.log | sed 's/] /\]\\n/g' | grep DNA | sed 's/DNA\[//g' | sed 's/\]//g' | cut -b 13- > ./%s/dna.log" % (ip_dirs, subdirs, ip_dirs))
     time.sleep(1)
+
 
 def gen_ghsav(ip_dirs):
     try:
@@ -71,6 +75,7 @@ def gen_ghsav(ip_dirs):
         time.sleep(1)
     except:
         pass
+
 
 def power_ghsav(ip_dirs):
     try:
@@ -89,6 +94,7 @@ def power_ghsav(ip_dirs):
             except:
                 f.write('0')
     time.sleep(1)
+
 
 def result_files(ip_dirs):
     os.system("paste -d, ./%s/freq.log ./%s/volt.log ./%s/ghsmm.log ./%s/temp.log ./%s/tmax.log ./%s/wu.log \
