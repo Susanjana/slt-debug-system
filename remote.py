@@ -7,6 +7,7 @@ import sys
 import time
 import paramiko
 
+
 def remote_cmd(ip, cmd, para):
     v = None
     retry = 3

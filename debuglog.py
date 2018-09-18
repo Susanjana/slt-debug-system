@@ -50,7 +50,7 @@ def debuglog_files(ip_dirs, ip):
 
 def read_debuglog(ip_dirs, subdirs, opt):
     try:
-        with open('./' + ip_dirs + '/' + subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
+        with open(ip_dirs + '/' + subdirs + '/' + 'CGMiner_Debug.log', 'r') as f:
             for lines in f:
                 tmp = str(re.findall(_patternd[opt], str(re.findall(_patterns[opt], lines)))).strip("[']")
                 with open(ip_dirs + '/' + opt + '.log', 'a') as f:
@@ -61,13 +61,14 @@ def read_debuglog(ip_dirs, subdirs, opt):
 
 
 def read_dna(ip_dirs, subdirs):
-    os.system("cat ./%s/%s/CGMiner_Debug.log | sed 's/] /\]\\n/g' | grep DNA | sed 's/DNA\[//g' | sed 's/\]//g' | cut -b 13- > ./%s/dna.log" % (ip_dirs, subdirs, ip_dirs))
+    os.system("cat ./%s/%s/CGMiner_Debug.log | sed 's/] /\]\\n/g' | grep DNA | sed 's/DNA\[//g' | sed 's/\]//g' | cut -b 13- \
+                > ./%s/dna.log" % (ip_dirs, subdirs, ip_dirs))
     time.sleep(1)
 
 
 def gen_ghsav(ip_dirs):
     try:
-        with open('./' + ip_dirs + '/' + 'wu.log', 'r') as f:
+        with open(ip_dirs + '/' + 'wu.log', 'r') as f:
             for line in f:
                 tmp = round(float(line.strip()) / 60 * 2**32 / 10**9, 3)
                 with open(ip_dirs + '/' + 'ghsav.log', 'a') as f:

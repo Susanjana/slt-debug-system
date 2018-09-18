@@ -18,12 +18,16 @@ logging.basicConfig(level=logging.INFO)
 
 
 def show_done(ip):
+    ''' Show process Done'''
+
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++  %s Done  ++++++++++++++++++++++++++++++++++++++++++++\033[0m" % ip)
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
 
 
 def modify_cgminer(option):
+    ''' Modify cgminer more_options '''
+
     flag = 0
     path = 'cgminer'
 
@@ -48,6 +52,8 @@ def modify_cgminer(option):
 
 
 def setup(ip):
+    ''' Get debuglog function '''
+
     ip_dirs = "result" + "-" + ip
     os.mkdir(ip_dirs)
 
@@ -75,11 +81,12 @@ def setup(ip):
 
         # Debuglog messages
         debuglog.debuglog_files(ip_dirs, ip)
-        freq = list(config.config['options'])[index].split()[1]
-        volt_level = list(config.config['options'])[index].split()[3]
+        freq = option.split()[1]
+        volt_level = option.split()[3]
         date = datetime.datetime.now().strftime('%Y.%m%d.%H%M%S')
         subdirs = ip + '-' + date + '-' + freq + '-' + volt_level
         os.mkdir('./%s/%s' % (ip_dirs, subdirs))
+
         # Freq, Volt_level and more_options
         os.system("echo %s > ./%s/freq.log" % (freq, ip_dirs))
         os.system("echo %s > ./%s/volt.log" % (volt_level, ip_dirs))
@@ -89,6 +96,7 @@ def setup(ip):
         os.system("cat ./%s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log" % (ip_dirs, ip_dirs, subdirs))
         os.system("cat ./%s/summary.log | grep -v Reply  > ./%s/%s/CGMiner_Summary.log" % (ip_dirs, ip_dirs, subdirs))
 
+        # Write csv files
         debuglog.read_debuglog(ip_dirs, subdirs, 'ghsmm')
         debuglog.read_debuglog(ip_dirs, subdirs, 'temp')
         debuglog.read_debuglog(ip_dirs, subdirs, 'tmax')
