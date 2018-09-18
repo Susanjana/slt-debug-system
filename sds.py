@@ -23,6 +23,30 @@ def show_done(ip):
     print("\033[1;32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\033[0m")
 
 
+def modify_cgminer(option):
+    flag = 0
+    path = 'cgminer'
+
+    with open(path, 'r') as f:
+        lines = f.readlines()
+
+    with open(path, 'w') as f:
+        for line in lines:
+            if 'more_options' in line:
+                tmp = list(line.split('\''))[1]
+                line = line.replace(tmp, option)
+                f.write(line)
+                flag = 1
+            elif line == '\n':
+                continue
+            else:
+                f.write(line)
+
+    if (flag == 0):
+        with open(path, 'a') as f:
+            f.write('\t' + 'option more_options ' + '\''+ option + '\'' + '\n')
+
+
 def setup(ip):
     ip_dirs = "result" + "-" + ip
     os.mkdir(ip_dirs)
@@ -32,16 +56,13 @@ def setup(ip):
     time.sleep(3)
 
     # Create csv file
-    os.system("echo Freq, Volt_level, GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH, Power/GHsav, DNA, Options >> ./%s/result-miner.csv" % ip_dirs)
-    index = 0
+    os.system("echo Freq, Volt_level, GHSmm, Temp, TMax, WU, GHsav, Iout, Power, DH, Power/GHsav, DNA, Options \
+                >> ./%s/result-miner.csv" % ip_dirs)
 
-    for tmp in options:
+    # Get debuglog
+    for option in options:
         # Modify cgminer file
-        tmp = "'%s'" % tmp
-        if not os.system('cat ./%s/cgminer | grep more_options' % ip_dirs):
-            os.system('more_options=`cat ./%s/cgminer | grep more_options`; sed -i "s/$more_options/        option more_options     %s/g" ./%s/cgminer' % (ip_dirs, tmp, ip_dirs))
-        else:
-            os.system("echo '       option more_options %s' >> ./%s/cgminer" % (tmp, ip_dirs))
+        modify_cgminer(option)
         time.sleep(5)
 
         # Send cgminer file to remote
@@ -67,7 +88,6 @@ def setup(ip):
         os.system("cat ./%s/estats.log | grep '\[MM ID' > ./%s/%s/CGMiner_Debug.log" % (ip_dirs, ip_dirs, subdirs))
         os.system("cat ./%s/edevs.log | grep -v Reply  > ./%s/%s/CGMiner_Edevs.log" % (ip_dirs, ip_dirs, subdirs))
         os.system("cat ./%s/summary.log | grep -v Reply  > ./%s/%s/CGMiner_Summary.log" % (ip_dirs, ip_dirs, subdirs))
-        index += 1
 
         debuglog.read_debuglog(ip_dirs, subdirs, 'ghsmm')
         debuglog.read_debuglog(ip_dirs, subdirs, 'temp')
